@@ -1,0 +1,11 @@
+[Unit]
+Description=QuboidMITMProxy
+After=network.target
+
+[Service]
+WorkingDirectory=/home/user/quboid-mitmproxy
+ExecStart=/home/user/quboid-mitmproxy/venv/bin/python3.5 /home/user/quboid-mitmproxy/venv/bin/mitmdump -T -s /home/user/quboid-mitmproxy/intercept.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
