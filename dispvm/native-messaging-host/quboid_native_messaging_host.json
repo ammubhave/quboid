@@ -1,0 +1,7 @@
+{
+	"name": "quboid_native_messaging_host",
+	"description": "Quboid Native Messaging Host",
+	"path": "/home/user/quboid/dispvm/native-messaging-host/quboid_native_messaging_host.py",
+	"type": "stdio",
+	"allowed_extensions": ["QuboidExtension@mit.edu"]
+}
