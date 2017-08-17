@@ -62,6 +62,7 @@ class SecureWorkstationProxy2:
                         vmname += str(c)
                     else:
                         break
+                vmname = '<' + vmname + '>'
                 if vmname in self.origins:
                     connection.send(self.origins[vmname].encode('utf-8'))
                 else:
@@ -85,28 +86,37 @@ class SecureWorkstationProxy2:
         try:
             print(flow.request.pretty_url)
             vmname = get_vmname_from_ip(flow.client_conn.address.host)
+            print(vmname, self.origins)
 
             if vmname not in self.origins:
-                # This is the first request in this VM, associate origin
-                request = urllib.request.Request(flow.request.pretty_url)
-                response = urllib.request.urlopen(request)
-                origin = response.getheader('Origin')
-                self.origins[vmname] = origin
+                try:
+                    # This is the first request in this VM, associate origin
+                    request = urllib.request.Request(flow.request.pretty_url)
+                    response = urllib.request.urlopen(request)
+                    origin = response.getheader('Origin')
 
-                if not origin.startswith('http'):
-                    origin = 'http://' + origin
-                request = urllib.request.Request(origin)
-                response = urllib.request.urlopen(request)
-                same_origin_patterns = response.getheader('Origin-Pattern')
-                allowed_external_patterns = response.getheader('Allowed-External-Pattern')
-                if same_origin_patterns is not None:
-                    self.same_origin_patterns[vmname] = list(map(str.strip, same_origin_patterns.split(',')))
-                else:
-                    self.same_origin_patterns[vmname] = []
-                if allowed_external_patterns is not None:
-                    self.allowed_external_patterns[vmname] = list(map(str.strip, allowed_external_patterns.split(',')))
-                else:
-                    self.allowed_external_patterns[vmname] = []
+                    if origin is None:
+                        raise Exception('No origin specified')
+
+                    self.origins[vmname] = origin
+                    if not origin.startswith('http'):
+                        origin = 'http://' + origin
+                    request = urllib.request.Request(origin)
+                    response = urllib.request.urlopen(request)
+                    same_origin_patterns = response.getheader('Origin-Pattern')
+                    allowed_external_patterns = response.getheader('Allowed-External-Pattern')
+                    if same_origin_patterns is not None:
+                        self.same_origin_patterns[vmname] = list(map(str.strip, same_origin_patterns.split(',')))
+                    else:
+                        self.same_origin_patterns[vmname] = []
+                    if allowed_external_patterns is not None:
+                        self.allowed_external_patterns[vmname] = list(map(str.strip, allowed_external_patterns.split(',')))
+                    else:
+                        self.allowed_external_patterns[vmname] = []
+                except Exception as ex:
+                    if vmname in self.origins:
+                        del self.origins[vmname]
+                    raise ex
 
             print(self.same_origin_patterns, self.origins)
 
@@ -127,16 +137,20 @@ class SecureWorkstationProxy2:
             # if approved:
             #     return
         except Exception as ex:
+            print('Exception', ex)
             pass
         flow.response = mitmproxy.http.HTTPResponse.make(403)
 
     def response(self, flow):
+        if flow.response.status_code == 403:
+            return
         vmname = get_vmname_from_ip(flow.client_conn.address.host)
+
         if not self._is_same_origin(vmname, flow.request.pretty_url):
             return
 
         if 'Origin-Pattern' in flow.response.headers:
-            same_origin_patterns = flow.response.headers['Allowed-External-Pattern'].split(',')
+            same_origin_patterns = flow.response.headers['Origin-Pattern'].split(',')
             for pattern in same_origin_patterns:
                 if pattern not in self.same_origin_patterns[vmname]:
                     self.same_origin_patterns[vmname].append(pattern)
