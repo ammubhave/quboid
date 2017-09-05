@@ -1,0 +1,21 @@
+\chapter{Conclusion} \label{chap:conclusion}
+
+Phishing attacks are a source of several major cyberattacks. As recent attacks have demonstrated, current systems are insufficient to prevent these attacks. This thesis presented the design an implementation of a workstation to help defend against phishing attacks.
+
+This thesis introduced policies which are focused to minimize the risk of phishing attacks. The policy of Site Aggregate Isolation dictated that websites which are of different site-aggregates must not share any state with each other and must not be able to communicate with each other. In view of modern web applications, we introduced exceptions to this policy to support loading resources from other site-aggregates. Lastly, we outlined the design of an unambiguous user interface that clearly identifies the source of any content displayed on the screen.
+
+We developed \namesecureworkstation/, a system based on Qubes OS to provide isolated browser instances belonging to different site-aggregates running in different virtual machines. The system consists of a transparent web proxy which filters the traffic based on the previously mentioned policies. We introduced new HTTP response headers to provide additional information about the web pages in order to support filtering in the proxy. We also implemented a user interface with reserved areas to display system and application content, and a clear display of the site-aggregate name of the active browser instance.
+
+We analyzed the effectiveness of the design by looking at recent phishing attacks and fictional scenarios. We played out how users would react using current systems in these scenarios and how would our design help defend against these attacks.
+
+Quboid is a system which helps the user in identifying phishing attempts. However, the system does have limitations. It does not prevent phishing attacks completely but reduces the likelihood of a successful attack. If users miss the cues provided by the system, they are still vulnerable to these attacks.
+
+\section{Future Work}
+
+The work performed in this thesis exclusively focused on defense against phishing attacks. We approached the design of \namesecureworkstation/ by reviewing recent phishing attacks and fictional scenarios. But if we take a step back, the reason behind phishing attacks is the ambiguity of authorship in modern internet. There was a time when visiting some website meant all the content the user sees is authored exclusively by the website owner. SSL/TLS certificates were invented which further strengthen the user's belief that the website they are is legitimate and has been externally vetted by trusted certificate authorities. However, with time both of these trends seem to have changed.
+
+Websites like Facebook and Reddit contain majority of content which has not been authored by the website owners but rather by the visitors of the website. Several certificate authorities have been established, some that allow users to gain certificates for their websites at no cost. These authorities just verify website ownership but not if the owner is a genuine entity. The times have changed and modern internet needs are a lot of different.
+
+In view of these changing needs, we need systems in place that can not only verify the authenticity of a website as whole but also parts of the website. We need methods to be able to verify the authorship of the content posted on the websites by other users. The failure of verification of authorship is what leads to phishing attacks.
+
+This is a more general problem than what the system presented in this thesis solves. One can envision an internet where every part of a website carries a proof of authenticity and ownership. Then the user may be able to specify policies based solely on the authorship rather than the different parameters that we mentioned in the design of Quboid.
