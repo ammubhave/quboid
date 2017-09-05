@@ -1,6 +1,8 @@
 # quboid
 Quboid: A Secure Workstation for Web Interaction
 
+The MEng. thesis is available in ambhave-thesis-final.pdf file or at <https://pdos.csail.mit.edu/publications/#amol-meng>
+
 Prerequisites:
 - Python 3.5 or higher
 
